@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/subdivision" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
