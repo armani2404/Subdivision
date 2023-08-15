@@ -454,8 +454,6 @@ class SubDiv:
             offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":self.n, "OFFSET":-self.lot_width, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]    
             partition_result = processing.run("native:splitwithlines", {"INPUT":layer, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
             QgsProject.instance().addMapLayer(partition_result)
-            #self.merged_result = partition_result
-            #QgsProject.instance().addMapLayer(self.merged_result)
         else:
             if self.length_1 > self.length_2:
                 X1 = self.pt2_x-(((self.length_2/2)*(self.pt2_x-self.pt3_x))/self.length_2)
@@ -578,10 +576,7 @@ class SubDiv:
                 pr.addFeatures([seg])
                 div_line = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                 #QgsProject.instance().addMapLayer(div_line)
-
-                    
                 offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":n, "OFFSET":-self.lot_width, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        
                 #QgsProject.instance().addMapLayer(offset_result)    
                 partition_result = processing.run("native:splitwithlines", {"INPUT":x, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                 #QgsProject.instance().addMapLayer(partition_result)
@@ -598,7 +593,6 @@ class SubDiv:
         input_dialog.setLabelText("Select parcel side adjacent to a road:")
         input_dialog.setIntRange(1, 4)
         input_dialog.setIntValue(1)
-        #input_dialog.setIntStep(1)
         input_dialog.show()
 
         if input_dialog.exec_() == QDialog.Accepted:
@@ -619,8 +613,6 @@ class SubDiv:
             self.lot_length = self.dlg.dsbLot_Length.value()
             self.lot_width = self.dlg.dsbLot_Width.value()
             layer = self.dlg.cbParcel.currentLayer()
-            
-            #self.input_dialog()
             side_vertices = processing.run("native:extractvertices", {"INPUT":self.memory_sides, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
             QgsProject.instance().addMapLayer(side_vertices)
             adjacent_vertices = processing.run("native:extractvertices", {"INPUT":self.memory_adjacents, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
@@ -632,7 +624,6 @@ class SubDiv:
                 geom = f.geometry()
                 x = geom.asPoint()
                 side_coords.append(x)
-            #print ("line_coords: ", line_coords) 
             side_pt1 = side_coords[0]
             side_pt1x = side_coords[0].x()
             side_pt1y = side_coords[0].y()
@@ -645,13 +636,9 @@ class SubDiv:
             side_pt4 = side_coords[3]
             side_pt4x = side_coords[3].x()
             side_pt4y = side_coords[3].y()
-            #print("line_pt1: ", line_pt1)
-            #print("line_pt2: ", line_pt2)
             d = QgsDistanceArea()
             side_length = d.measureLine(side_pt1, side_pt2)
             opp_side_length = d.measureLine(side_pt3, side_pt4)
-            #print("side_length: ", side_length)
-            #print("oppside_length: ", opp_side_length)
 
             #Length of parcel sides not adjacent to the road
             adj_coords= []
@@ -673,13 +660,10 @@ class SubDiv:
             adj_pt4 = adj_coords[3]
             adj_pt4x = adj_coords[3].x()
             adj_pt4y = adj_coords[3].y()
-            #print("line_pt1: ", line_pt1)
-            #print("line_pt2: ", line_pt2)
             d = QgsDistanceArea()
             adj_length = d.measureLine(adj_pt1, adj_pt2)
             opp_adj_length = d.measureLine(adj_pt3, adj_pt4)
-            #print("adjacent_length: ", adj_length)
-            #print("opposite adjacent_length: ", opp_adj_length)
+            
             
             if side_length >= adj_length:
                 if adj_length <= self.lot_length:
@@ -691,7 +675,6 @@ class SubDiv:
                     n = int((side_length/self.lot_width) - 2)
                     if n < 1:
                         n = 1
-                    #print ("n: ", n)
                     line_start = QgsPoint(X1, Y1)
                     line_end = QgsPoint(X2, Y2)
                     line = QgsGeometry.fromPolyline([line_start, line_end])
@@ -703,7 +686,7 @@ class SubDiv:
                     seg.setGeometry(line)
                     pr.addFeatures([seg])
                     div_line = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                    QgsProject.instance().addMapLayer(div_line)
+                    #QgsProject.instance().addMapLayer(div_line)
                     
                     offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":n, "OFFSET":-self.lot_width, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                     partition_result = processing.run("native:splitwithlines", {"INPUT":layer, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
@@ -726,7 +709,7 @@ class SubDiv:
                     seg.setGeometry(line)
                     pr.addFeatures([seg])
                     centreline = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                    QgsProject.instance().addMapLayer(centreline)
+                    #QgsProject.instance().addMapLayer(centreline)
                     
                     partition_result = self.roads(centreline)
                     
@@ -738,8 +721,8 @@ class SubDiv:
                         splitted_layers.append(split_layer)
                     
 
-                    for z in splitted_layers:
-                        QgsProject.instance().addMapLayer(z)
+                    #for z in splitted_layers:
+                        #QgsProject.instance().addMapLayer(z)
                         
                     merged = []
                     for x in splitted_layers:
@@ -858,9 +841,9 @@ class SubDiv:
                     merged = []
                     for x in splitted_layers:
                         bounds_result = processing.run("native:orientedminimumboundingbox", {"INPUT":x, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(bounds_result)
+                        #QgsProject.instance().addMapLayer(bounds_result)
                         vertices_result = processing.run("native:extractvertices", {"INPUT":bounds_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(vertices_result)
+                        #QgsProject.instance().addMapLayer(vertices_result)
                         coords = [] 
                         features = vertices_result.getFeatures()
                         for feature in features:
@@ -927,10 +910,10 @@ class SubDiv:
                         #add the geometry to the layer
                         pr.addFeatures([seg])
                         div_line = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(div_line)
+                        #QgsProject.instance().addMapLayer(div_line)
                         
                         offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":n, "OFFSET":self.lot_length, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(offset_result)    
+                        #QgsProject.instance().addMapLayer(offset_result)    
                         
                         partition_result = processing.run("native:splitwithlines", {"INPUT":x, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                         #QgsProject.instance().addMapLayer(partition_result)
@@ -954,7 +937,7 @@ class SubDiv:
                     seg.setGeometry(line)
                     pr.addFeatures([seg])
                     centreline = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                    QgsProject.instance().addMapLayer(centreline)
+                    #QgsProject.instance().addMapLayer(centreline)
                     
                     partition_result = self.roads(centreline)
                     
@@ -965,8 +948,8 @@ class SubDiv:
                         split_layer = QgsVectorLayer(i,"Splitted","ogr")
                         splitted_layers.append(split_layer)
                     
-                    for z in splitted_layers:
-                        QgsProject.instance().addMapLayer(z)
+                    #for z in splitted_layers:
+                        #QgsProject.instance().addMapLayer(z)
                     
                     merged = []
                     for x in splitted_layers:
@@ -1052,11 +1035,6 @@ class SubDiv:
                     QgsProject.instance().addMapLayer(merged_result)
         else:
             return
-                    
-    def select_output_file(self):
-        filename, _filter = QFileDialog.getSaveFileName(
-            self.dlg, "Select output file ", "", 'All Files (*)')
-        self.dlg.lineEdit.setText(filename)
 
     def run(self):
         """Run method that performs all the real work"""
