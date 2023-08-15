@@ -194,32 +194,7 @@ class SubDiv:
             self.iface.removePluginMenu(
                 self.tr(u'&Subdivision'),
                 action)
-            self.iface.removeToolBarIcon(action)
-          
-    '''
-    #Not currently in use
-    def parcel_area(self):
-        #Setting the active layer to the currently selected layer
-        layer = self.dlg.cbParcel.currentLayer()
-        #Accessing the layer's features 
-        features = layer.getFeatures()
-        #Creating the measurement object instance
-        d = QgsDistanceArea()
-
-        for f in features:
-            geom = f.geometry()
-            name = f.attribute("OBJECTID")
-            #Calculates area of the polygon
-            area = d.measureArea(geom)
-            self.dlg.lblArea.setNum(area)
-            print (name)
-            print ("Area in square metres:", area)
-            
-    def adjacent_roads(self):
-        parcels = self.dlg.cbParcel.currentLayer()
-        roads = self.dlg.cbRoad.currentLayer()
-        processing.run("native:selectbylocation", {"INPUT":roads,"PREDICATE":4, "INTERSECT":parcels, "METHOD":0})
-    '''   
+            self.iface.removeToolBarIcon(action)  
   
     def explode_lines(self):
         layer = self.dlg.cbParcel.currentLayer()
@@ -446,8 +421,6 @@ class SubDiv:
         return partition_result
         
     def partition(self):
-        '''I have commented all statements for displaying the resulting layers 
-            except for the final ones since these other ones don't need to be displayed'''
         self.lot_length = self.dlg.dsbLot_Length.value()
         layer = self.dlg.cbParcel.currentLayer()
         self.long_short_axis()
@@ -637,7 +610,7 @@ class SubDiv:
         else:
             # The user clicked the "Cancel" button
             self.partition()
-            #print("The user cancelled the input dialog
+            #The user cancelled the input dialog
         QgsProject.instance().removeMapLayer(explode)
         
             
@@ -710,15 +683,11 @@ class SubDiv:
             
             if side_length >= adj_length:
                 if adj_length <= self.lot_length:
-                    #print("METHOD 1")
+                    #METHOD 1
                     X1 = side_pt1x-(((self.lot_width)*(side_pt1x-side_pt2x))/side_length)
                     Y1 = side_pt1y-(((self.lot_width)*(side_pt1y-side_pt2y))/side_length)
-                    #print(f"X1: {X1}")
-                    #print(f"Y1: {Y1}")
                     X2 = side_pt4x-(((self.lot_width)*(side_pt4x-side_pt3x))/opp_side_length)
                     Y2 = side_pt4y-(((self.lot_width)*(side_pt4y-side_pt3y))/opp_side_length)
-                    #print(f"X2: {X2}")
-                    #print(f"Y2: {Y2}")
                     n = int((side_length/self.lot_width) - 2)
                     if n < 1:
                         n = 1
@@ -740,16 +709,11 @@ class SubDiv:
                     partition_result = processing.run("native:splitwithlines", {"INPUT":layer, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                     QgsProject.instance().addMapLayer(partition_result)
                 else:
-                    #print("METHOD 2")
-                    
+                    #"METHOD 2"
                     X1 = side_pt1x-(((side_length/2)*(side_pt1x-side_pt2x))/side_length)
                     Y1 = side_pt1y-(((side_length/2)*(side_pt1y-side_pt2y))/side_length)
-                    #print(f"X1: {X1}")
-                    #print(f"Y1: {Y1}")
                     X2 = side_pt4x-(((opp_side_length/2)*(side_pt4x-side_pt3x))/opp_side_length)
                     Y2 = side_pt4y-(((opp_side_length/2)*(side_pt4y-side_pt3y))/opp_side_length)
-                    #print(f"X2: {X2}")
-                    #print(f"Y2: {Y2}")
                     
                     line_start = QgsPoint(X1, Y1)
                     line_end = QgsPoint(X2, Y2)
@@ -772,7 +736,7 @@ class SubDiv:
                     for i in split_result:
                         split_layer = QgsVectorLayer(i,"Splitted","ogr")
                         splitted_layers.append(split_layer)
-                    #print (splitted_layers)
+                    
 
                     for z in splitted_layers:
                         QgsProject.instance().addMapLayer(z)
@@ -780,13 +744,9 @@ class SubDiv:
                     merged = []
                     for x in splitted_layers:
                         bounds_result = processing.run("native:orientedminimumboundingbox", {"INPUT":x, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(bounds_result)
-                        #lines = processing.run("native:polygonstolines", {"INPUT":bounds_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        #QgsProject.instance().addMapLayer(lines)
-                        #explode = processing.run("native:explodelines", {"INPUT":lines, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        #QgsProject.instance().addMapLayer(explode2)
+                        #QgsProject.instance().addMapLayer(bounds_result)
                         vertices_result = processing.run("native:extractvertices", {"INPUT":bounds_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(vertices_result)
+                        #QgsProject.instance().addMapLayer(vertices_result)
                         coords = [] 
                         features = vertices_result.getFeatures()
                         for feature in features:
@@ -810,10 +770,6 @@ class SubDiv:
                         length_2 = d.measureLine(pt2, pt3)
                         length_3 = d.measureLine(pt3, pt4)
                         length_4 = d.measureLine(pt4, pt1)
-                        #print ("length1: ", length_1)
-                        #print ("length2: ", length_2)
-                        #print ("length3: ", length_3)
-                        #print ("length4: ", length_4)
                     
                         if length_1 > length_2:
                             if length_1 >= length_3:
@@ -834,24 +790,15 @@ class SubDiv:
                                 short_axis = length_1
                             else:
                                 short_axis = length_3
-                            n = int((long_axis/self.lot_width)-2)
-                        #print("Long axis: ", long_axis)
-                        #print("Short axis: ", short_axis)
-                        #print ("n: ", n)    
+                            n = int((long_axis/self.lot_width)-2)  
                         if n < 1:
                             n = 1
-                        #print ("n: ", n)
                         
                         X1 = pt1_x-((self.lot_width*(pt1_x-pt2_x))/length_1)
                         Y1 = pt1_y-((self.lot_width*(pt1_y-pt2_y))/length_1)
                     
                         X2 = pt4_x-((self.lot_width*(pt4_x-pt3_x))/length_3)
                         Y2 = pt4_y-((self.lot_width*(pt4_y-pt3_y))/length_3)
-                        
-                        #print(f"X1: {X1}")
-                        #print(f"Y1: {Y1}")
-                        #print(f"X2: {X2}")
-                        #print(f"Y2: {Y2}")
                         
                         line_start = QgsPoint(X1, Y1)
                         line_end = QgsPoint(X2, Y2)
@@ -867,11 +814,9 @@ class SubDiv:
                         #add the geometry to the layer
                         pr.addFeatures([seg])
                         div_line = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(div_line)
-                        
+                        #QgsProject.instance().addMapLayer(div_line)
                         offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":n, "OFFSET":-self.lot_width, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                         #QgsProject.instance().addMapLayer(offset_result)    
-                        
                         partition_result = processing.run("native:splitwithlines", {"INPUT":x, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                         #QgsProject.instance().addMapLayer(partition_result)
                         merged.append(partition_result)
@@ -882,12 +827,8 @@ class SubDiv:
                 if side_length <= self.lot_length:
                     X1 = side_pt1x-(((side_length/2)*(side_pt1x-side_pt2x))/side_length)
                     Y1 = side_pt1y-(((side_length/2)*(side_pt1y-side_pt2y))/side_length)
-                    #print(f"X1: {X1}")
-                    #print(f"Y1: {Y1}")
                     X2 = side_pt4x-(((opp_side_length/2)*(side_pt4x-side_pt3x))/opp_side_length)
                     Y2 = side_pt4y-(((opp_side_length/2)*(side_pt4y-side_pt3y))/opp_side_length)
-                    #print(f"X2: {X2}")
-                    #print(f"Y2: {Y2}")
 
                     line_start = QgsPoint(X1, Y1)
                     line_end = QgsPoint(X2, Y2)
@@ -900,7 +841,7 @@ class SubDiv:
                     seg.setGeometry(line)
                     pr.addFeatures([seg])
                     centreline = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                    QgsProject.instance().addMapLayer(centreline)
+                    #QgsProject.instance().addMapLayer(centreline)
                     
                     partition_result = self.roads(centreline)
                     
@@ -910,10 +851,9 @@ class SubDiv:
                     for i in split_result:
                         split_layer = QgsVectorLayer(i,"Splitted","ogr")
                         splitted_layers.append(split_layer)
-                    #print (splitted_layers)
 
-                    for z in splitted_layers:
-                        QgsProject.instance().addMapLayer(z)
+                    #for z in splitted_layers:
+                        #QgsProject.instance().addMapLayer(z)
                     
                     merged = []
                     for x in splitted_layers:
@@ -944,10 +884,6 @@ class SubDiv:
                         length_2 = d.measureLine(pt2, pt3)
                         length_3 = d.measureLine(pt3, pt4)
                         length_4 = d.measureLine(pt4, pt1)
-                        #print ("length1: ", length_1)
-                        #print ("length2: ", length_2)
-                        #print ("length3: ", length_3)
-                        #print ("length4: ", length_4)
                         
                         if length_1 > length_2:
                             if length_1 >= length_3:
@@ -968,23 +904,14 @@ class SubDiv:
                                 short_axis = length_1
                             else:
                                 short_axis = length_3
-                            n = round((long_axis/self.lot_length)-2)
-                        #print("Long axis: ", long_axis)
-                        #print("Short axis: ", short_axis)
-                        #print ("n: ", n)    
+                            n = round((long_axis/self.lot_length)-2)   
                         if n < 1:
                             n = 1
-                        #print ("n: ", n)
-                        
                         
                         X1 = pt1_x-((self.lot_length*(pt1_x-pt4_x))/length_4)
                         Y1 = pt1_y-((self.lot_length*(pt1_y-pt4_y))/length_4)
                         X2 = pt2_x-((self.lot_length*(pt2_x-pt3_x))/length_2)
                         Y2 = pt2_y-((self.lot_length*(pt2_y-pt3_y))/length_2)
-                        #print(f"X1: {X1}")
-                        #print(f"Y1: {Y1}")
-                        #print(f"X2: {X2}")
-                        #print(f"Y2: {Y2}")
 
                         line_start = QgsPoint(X1, Y1)
                         line_end = QgsPoint(X2, Y2)
@@ -1008,7 +935,6 @@ class SubDiv:
                         partition_result = processing.run("native:splitwithlines", {"INPUT":x, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                         #QgsProject.instance().addMapLayer(partition_result)
                         merged.append(partition_result)
-                    #print(merged)
                     merged_result = processing.run("native:mergevectorlayers", {"LAYERS":merged, "CRS":"","OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                     QgsProject.instance().addMapLayer(merged_result)
                 else:
@@ -1045,9 +971,9 @@ class SubDiv:
                     merged = []
                     for x in splitted_layers:
                         bounds_result = processing.run("native:orientedminimumboundingbox", {"INPUT":x, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(bounds_result)
+                        #QgsProject.instance().addMapLayer(bounds_result)
                         vertices_result = processing.run("native:extractvertices", {"INPUT":bounds_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(vertices_result)
+                        #QgsProject.instance().addMapLayer(vertices_result)
                         coords = [] 
                         features = vertices_result.getFeatures()
                         for feature in features:
@@ -1114,10 +1040,10 @@ class SubDiv:
                         #add the geometry to the layer
                         pr.addFeatures([seg])
                         div_line = processing.run("native:extendlines",{"INPUT": v_layer, "START_DISTANCE":5, "END_DISTANCE":5, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(div_line)
+                        #QgsProject.instance().addMapLayer(div_line)
                         
                         offset_result = processing.run("native:arrayoffsetlines", {"INPUT":div_line, "COUNT":n, "OFFSET":self.lot_width, "SEGMENT": 8, "JOIN_STYLE":0, "MITER_LIMIT":2, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-                        QgsProject.instance().addMapLayer(offset_result)    
+                        #QgsProject.instance().addMapLayer(offset_result)    
                         
                         partition_result = processing.run("native:splitwithlines", {"INPUT":x, "LINES":offset_result, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
                         #QgsProject.instance().addMapLayer(partition_result)
@@ -1131,28 +1057,6 @@ class SubDiv:
         filename, _filter = QFileDialog.getSaveFileName(
             self.dlg, "Select output file ", "", 'All Files (*)')
         self.dlg.lineEdit.setText(filename)
-        #I have used the QgsFileWidget ("file_widget_properties" method) to save the output instead of the QLineEdit
-        #and QPushButton as is used in this function
-    '''   
-    def file_widget_properties(self): 
-        self.dlg.file_output.setFilter("Shapefiles (*.shp)")
-        self.dlg.file_output.setStorageMode(QgsFileWidget.SaveFile)
-        self.dlg.file_output.fileChanged.connect(self.save_shapefile)
-        #Here file_output is not defined
-     
-    def save_shapefile(self, shapefile, file_path):
-        # Create a data source for the shapefile
-        data_source = self.merged_result
-
-        # Create a layer name for the shapefile
-        layer_name = self.merged_result.dataProvider().dataSourceUri()
-
-        # Create a new instance of the QgsVectorFileWriter class
-        writer = QgsVectorFileWriter.writeAsVectorFormat(data_source, layer_name, "utf-8",driverName = "ESRI Shapefile")
-    ''' 
-        
-        
-
 
     def run(self):
         """Run method that performs all the real work"""
@@ -1161,12 +1065,7 @@ class SubDiv:
         if self.first_start == True:
             self.first_start = False
             self.dlg = SubDivDialog()
-            #self.dlg.pbselectSide.clicked.connect(self.select_side)
-            #self.dlg.pbOutput.clicked.connect(self.select_output_file)
-            #self.dlg.pbArea.clicked.connect(self.parcel_area)
-            #self.dlg.pbselectRoad.clicked.connect(self.adjacent_roads)
             
-        #self.file_widget_properties()
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -1176,6 +1075,4 @@ class SubDiv:
             self.input_dialog()
             self.roadside_partition()
             
-            #self.save_shapefile(self.merged_result,) 
-            #there is one argument missing (file_path)
-             
+            
