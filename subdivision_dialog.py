@@ -42,9 +42,6 @@ class SubDivDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        #self.cbParcel.setFilters(QgsMapLayerProxyModel::PolygonLayer)
-        #self.dsbBlock_Area.setDecimals(4)
-        #self.dsbBlock_Area.setSuffix(" Hectares")
         self.dsbLot_Width.setMinimum(15)
         self.dsbLot_Width.setDecimals(3)
         self.dsbLot_Width.setSuffix(" Metres")
