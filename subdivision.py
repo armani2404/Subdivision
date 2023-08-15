@@ -599,8 +599,8 @@ class SubDiv:
             # The user clicked the "OK" button and entered a value
             value = input_dialog.intValue()
             self.memory_sides, self.memory_adjacents = self.dialog(value)
-            QgsProject.instance().addMapLayer(self.memory_sides)
-            QgsProject.instance().addMapLayer(self.memory_adjacents)
+            #QgsProject.instance().addMapLayer(self.memory_sides)
+            #QgsProject.instance().addMapLayer(self.memory_adjacents)
         else:
             # The user clicked the "Cancel" button
             self.partition()
@@ -614,9 +614,9 @@ class SubDiv:
             self.lot_width = self.dlg.dsbLot_Width.value()
             layer = self.dlg.cbParcel.currentLayer()
             side_vertices = processing.run("native:extractvertices", {"INPUT":self.memory_sides, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-            QgsProject.instance().addMapLayer(side_vertices)
+            #QgsProject.instance().addMapLayer(side_vertices)
             adjacent_vertices = processing.run("native:extractvertices", {"INPUT":self.memory_adjacents, "OUTPUT":"TEMPORARY_OUTPUT"})["OUTPUT"]
-            QgsProject.instance().addMapLayer(adjacent_vertices)
+            #QgsProject.instance().addMapLayer(adjacent_vertices)
             #Length of parcel side adjacent to the road
             side_coords= []
             feat = side_vertices.getFeatures()
