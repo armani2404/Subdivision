@@ -774,18 +774,19 @@ class SubDiv:
                             n = 1
                         
                         if length_1 > length_2:
-                            X1 = pt1_x-((self.lot_width*(pt1_x-pt2_x))/length_1)
-                            Y1 = pt1_y-((self.lot_width*(pt1_y-pt2_y))/length_1)
-
-                            X2 = pt4_x-((self.lot_width*(pt4_x-pt3_x))/length_3)
-                            Y2 = pt4_y-((self.lot_width*(pt4_y-pt3_y))/length_3)
-                        else: 
                             X1 = pt2_x-((self.lot_width*(pt2_x-pt3_x))/length_2)
                             Y1 = pt2_y-((self.lot_width*(pt2_y-pt3_y))/length_2)
 
                             X2 = pt1_x-((self.lot_width*(pt1_x-pt4_x))/length_4)
                             Y2 = pt1_y-((self.lot_width*(pt1_y-pt4_y))/length_4)
-                        
+                            
+                        else: 
+                            X1 = pt1_x-((self.lot_width*(pt1_x-pt2_x))/length_1)
+                            Y1 = pt1_y-((self.lot_width*(pt1_y-pt2_y))/length_1)
+
+                            X2 = pt4_x-((self.lot_width*(pt4_x-pt3_x))/length_3)
+                            Y2 = pt4_y-((self.lot_width*(pt4_y-pt3_y))/length_3)
+                            
                         line_start = QgsPoint(X1, Y1)
                         line_end = QgsPoint(X2, Y2)
                         line = QgsGeometry.fromPolyline([line_start, line_end])
